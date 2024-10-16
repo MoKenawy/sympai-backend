@@ -57,7 +57,7 @@ Set the necessary environment variables for deployment:
    ```
 
 ## License
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](https://github.com/MoKenawy/sympai-backend/blob/main/LICENSE).
 
 # Related Repositories
 [SympAI Frontend](https://github.com/MoKenawy/sympai-front)
