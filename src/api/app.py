@@ -12,14 +12,12 @@ sys.path.append(os.getenv('INIT_PATHS_DIR'))
 
 import init  # noqa: E402, F401
 from dynamo_db.message_history import get_chat_hist  # noqa: E402
-from dynamo_db.scan_sessions import get_all_session_ids
+from dynamo_db.scan_sessions import get_all_session_ids  # noqa: E402
 from models.biomistral import llm  # noqa: E402
 from config import aws_session , CHAT_HISTORY_TABLE_NAME  # noqa: E402
 from chains import new_chat_chain  # noqa: E402
 from schemas.schema import ChatProps , GetChatHistProps  # noqa: E402
-from langchain_community.chat_message_histories import (
-    DynamoDBChatMessageHistory,
-)
+
 
 
 app = FastAPI()
@@ -28,7 +26,8 @@ app = FastAPI()
 origins = [
     "http://localhost:3000",  # Your Next.js frontend URL
     "http://127.0.0.1:3000",  # Another form of localhost URL
-    "*"
+    "*",
+    "https://master.d3qfb4jv3hhifa.amplifyapp.com",  
 ]
 
 # Apply the CORS middleware

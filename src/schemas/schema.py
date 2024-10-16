@@ -1,4 +1,4 @@
-
+from langchain_ollama.chat_models import ChatOllama
 from pydantic import BaseModel, ConfigDict, Field
 from langchain_community.chat_message_histories.dynamodb import DynamoDBChatMessageHistory
 from langchain_core.language_models.chat_models import BaseChatModel
@@ -44,5 +44,7 @@ class ChatProps(BaseModel):
     chat_history: DynamoDBChatMessageHistory
     trimmed_chat_history : List[BaseMessage] = None
     response: str = None
+    model : ChatOllama = None
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
 

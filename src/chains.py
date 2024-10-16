@@ -17,7 +17,7 @@ sys.path.append(os.getenv('INIT_PATHS_DIR'))
 
 from schemas.schema import ChatProps, GetChatHistProps , UserInferenceInput  # noqa: E402
 from schemas.schema import UserInferenceInput  # noqa: E402, F811
-from langchain_core.messages import SystemMessage, trim_messages
+from langchain_core.messages import trim_messages  # noqa: E402
 
 
 
@@ -53,7 +53,6 @@ def add_user_message_to_history(chatProps: ChatProps) -> ChatProps:
     return chatProps
 
 
-
 trimmer = trim_messages(
     max_tokens=4096,
     strategy="last",
@@ -71,6 +70,12 @@ def trim_history(chatProps: ChatProps) -> ChatProps:
 # New chat Chain
 def prompt_LLM_with_history(chatProps: ChatProps):
     response = biomistral.invoke(chatProps.trimmed_chat_history)
+    chatProps.response = response.content
+    return chatProps
+
+
+def prompt_custom_model_with_history(chatProps: ChatProps):
+    response = chatProps.model.invoke(chatProps.trimmed_chat_history)
     chatProps.response = response.content
     return chatProps
 

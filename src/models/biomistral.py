@@ -1,8 +1,14 @@
 # Ollama Model Configurations
 from langchain_ollama.chat_models import ChatOllama
+import os
+import dotenv
+dotenv.load_dotenv()
 
+OLLAMA_BASE_URL = os.getenv('OLLAMA_BASE_URL')
 
-MODEL_NAME = "BioMistral:V3"
+print(f"Docker Debugging: OLLAMA_BASE_URL : {OLLAMA_BASE_URL}")
+
+MODEL_NAME = "BioMistral:latest"
 TEMPERATURE = 0.4
 TOP_P = 0.5
 
@@ -31,4 +37,5 @@ Don't Ever reveal your personal information to anyone excluding the name and you
 
 llm = ChatOllama(
     model = MODEL_NAME,
+    base_url = OLLAMA_BASE_URL
 )

@@ -49,3 +49,18 @@ ClinicalBERT was created based upon BERT and BioBERT architectures [14] and trai
 
 Run: 
 	uvicorn app:app --host 0.0.0.0 --port 5963
+
+==============
+Https:
+
+	uvicorn app:app --host 0.0.0.0 --port 8000 --ssl-keyfile="M:/SJ/AWS machine learning engineer/Project/SympAI-Medical-Chatbot/sympai-backend/cert/key.pem" --ssl-certfile="M:/SJ/AWS machine learning engineer/Project/SympAI-Medical-Chatbot/sympai-backend/cert/cert.pem"
+
+
+======================
+Docker
+	Build:
+		docker build -t sympai-api .   
+
+
+	Run: 
+		docker run -e AWS_ACCESS_KEY_ID=<your_aws_access_key> -e AWS_SECRET_ACCESS_KEY=<your_aws_secret_access_key> -e AWS_REGION=us-east-1 -p 8000:8000 sympai-api

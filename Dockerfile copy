@@ -1,0 +1,36 @@
+# Stage 1: Build dependencies
+FROM python:3.12.1-slim AS build
+
+# Set the working directory in the build stage
+WORKDIR /app
+
+# Copy the requirements file first to leverage Docker's cache
+COPY ./requirements.txt /app/requirements.txt
+
+# Install dependencies (only for building stage)
+RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
+
+# Stage 2: Final image
+FROM python:3.12.1-slim
+
+# Set the working directory in the final stage
+WORKDIR /app
+
+# Copy only the necessary files from the build stage
+COPY --from=build /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=build /usr/local/bin /usr/local/bin
+
+# Copy the rest of the application code to the final image
+COPY . .
+
+# Set environment variables (use secrets for AWS in production)
+ENV INIT_PATHS_DIR="/app/src"
+ENV AWS_REGION="us-east-1"
+ENV FRONT_URL="http://localhost:3000"
+ENV OLLAMA_BASE_URL="http://localhost:11434"
+# Expose the port FastAPI will run on
+EXPOSE 8000
+EXPOSE 11434
+
+# Command to run the FastAPI app using Uvicorn
+CMD ["uvicorn", "src.api.app:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -7,8 +7,8 @@ load_dotenv()
 sys.path.append(os.getenv('INIT_PATHS_DIR'))
 
 import init  # noqa: E402, F401
-
 from config import aws_config , CHAT_HISTORY_TABLE_NAME
+
 
 # Initialize a session using Amazon DynamoDB
 dynamodb = boto3.resource('dynamodb',
@@ -16,10 +16,11 @@ dynamodb = boto3.resource('dynamodb',
                           aws_access_key_id = aws_config.aws_access_key_id,
                           aws_secret_access_key = aws_config.aws_secret_access_key)
 
-
+print(f"got dynamodb session: {dynamodb}") 
 # Select your DynamoDB table
 table_name = CHAT_HISTORY_TABLE_NAME # Replace with your table name
 table = dynamodb.Table(table_name)
+
 
 
 # Scan the table to get all SessionId(s) (partition key)
