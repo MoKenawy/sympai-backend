@@ -4,6 +4,8 @@
 
 ## Overview
 SympAI Backend provides the core API services for the SympAI healthcare chatbot, which assists users in identifying symptoms and receiving preliminary medical advice. The backend is built using FastAPI, integrated with natural language processing (NLP) models, and is containerized for easy deployment.
+  </br>
+
 <image src="https://github.com/MoKenawy/sympai-backend/blob/main/docs/API-0.png"/>
 
   </br>
