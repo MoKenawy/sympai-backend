@@ -1,51 +1,63 @@
-ollama 
 
-llama index
+# SympAI Backend
 
-pathway
+## Overview
+SympAI Backend provides the core API services for the SympAI healthcare chatbot, which assists users in identifying symptoms and receiving preliminary medical advice. The backend is built using FastAPI, integrated with natural language processing (NLP) models, and is containerized for easy deployment.
+
+This repository works together with the [SympAI Frontend](https://github.com/MoKenawy/sympai-front), which provides the web-based user interface.
+
+## Features
+- FastAPI-based API for handling chatbot queries.
+- Integration with pre-trained medical NLP models (BioMistral 7B, Meditron 7B).
+- Support for multi-turn conversations using LangChain.
+- Dockerized for ease of deployment and scaling.
+- Deployed on AWS EC2 with API Gateway and Load Balancer.
+
+## Installation
+
+### Prerequisites
+- Docker
+- Python 3.12
+- AWS CLI (for deployment)
+- Ollama (for running the NLP models locally)
+
+### Install dependencies
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/symp-ai-backend.git
+   cd symp-ai-backend
+   ```
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### Set up environment variables:
+Set the necessary environment variables for deployment:
+   ```bash
+   export AWS_ACCESS_KEY_ID= <your aws_access_key_id>
+   export AWS_SECRET_ACCESS_KEY= <your aws_secret_access_key>
+   export INIT_PATHS_DIR="/app/src"
+   export AWS_REGION="us-east-1"
+   export FRONT_URL="http://localhost:3000"  # Link to the frontend
+   export OLLAMA_BASE_URL="http://localhost:11434"
+   ```
 
 
-Huggin Face:
-	Transformers
-	Hub
-	Datasets
-	Pipeline
+## Run Docker to containerize the backend:
+1. Build the Docker image:
+   ```bash
+   docker build -t sympai-backend .
+   ```
 
-https://www.youtube.com/watch?v=QEaBAZQCtwE&ab_channel=AssemblyAI
+1. Run the container:
+   ```bash
+   docker run -p 8000:8000 sympai-backend
+   ```
 
+## License
+This project is licensed under the MIT License.
 
-tokenization
-
-embeddings
-
-
-Package manager
-	pip
-	Git
-	
-==================================================================================================
-
-
-Med‐PaLM 2
-
-
- ChatDoctor (an open‐source Chatbotfor health care) was based on LLaMA and used 100,000 patient‐physician conversations to fine‐tune[28]; this model showed significant improvements inunderstanding patients' needs and providing accurate advice.
-
- https://www.chatdoctor.com/
- https://github.com/Kent0n-Li/ChatDoctor/tree/main
-
-
-
- Similarly, Baize‐health care [29] is another open‐source Chatbot for health care based on LLaMA,which has been fine‐tuned using MedQuAD data set[30] (including 46,867 medical dialogues) and per-formed well in multi‐turn conversations. These models will facilitate the further development of conversation models in health care.
-
-
- performance of PaLM in medical questions was optimized through instruction prompt tuning to develop Med‐PaLM [26] (ChatGPT‐like ChatBot forHealth care). Subsequent development at Google has resulted in the production of Med‐PaLM 2 [27], whichreportedly achieves state‐of‐the‐art performance inUnited States Medical Licensing Examinations(USMLE) questions, exceeding the performance ofChatGPT [20].
-
-GatorTron:
-ClinicalBERT was created based upon BERT and BioBERT architectures [14] and trained on the MIMIC‐III data set [24]. MIMIC‐III comprises demo graphics,vital signs, laboratory tests, procedures, medications,clinical notes, investigation reports, and mortality datacorresponding to over 40,000 critical care patients—arich source of domain‐specific information [24]. Clin-icalBERT attained superior performance to BERT andBioBERT across a range of medical NLP tasks, demon-strating the promise of using clinical corpora to fine‐tuneLLMs to optimize domain‐specific performance [14]. Inaddition, GatorTron, the largest clinical language modelavailable, was trained from scratch using over 90 billionwords of text from the deidentified clinical notes ofUniversity of Florida Health, PubMed articles andWikipedia [25]. This model increases the parametercount of LLMs within the clinical domain from 110million (ClinicalBERT) to 8.9 billion. It has achievedcompetitive performance across multiple downstreamclinical tasks, demonstrating the advantage of using large“Transformer” models.
-
-
-===============
-
-Run: 
-	uvicorn app:app --host 0.0.0.0 --port 5963
+# Related Repositories
+[SympAI Frontend](https://github.com/MoKenawy/sympai-front)
