@@ -1,10 +1,21 @@
-
 # SympAI Backend
+
+<image src="https://github.com/MoKenawy/sympai-backend/blob/main/docs/symp-ai-logo.jfif" width="100%" height="500px"/>
 
 ## Overview
 SympAI Backend provides the core API services for the SympAI healthcare chatbot, which assists users in identifying symptoms and receiving preliminary medical advice. The backend is built using FastAPI, integrated with natural language processing (NLP) models, and is containerized for easy deployment.
+<image src="https://github.com/MoKenawy/sympai-backend/blob/main/docs/API-0.png"/>
+
+  </br>
+  <hr>
+
+
 
 This repository works together with the [SympAI Frontend](https://github.com/MoKenawy/sympai-front), which provides the web-based user interface.
+  </br>
+
+<image src="https://github.com/MoKenawy/sympai-backend/blob/main/docs/Context-Diagram_Level_0.svg" />
+
 
 ## Features
 - FastAPI-based API for handling chatbot queries.
@@ -12,6 +23,10 @@ This repository works together with the [SympAI Frontend](https://github.com/MoK
 - Support for multi-turn conversations using LangChain.
 - Dockerized for ease of deployment and scaling.
 - Deployed on AWS EC2 with API Gateway and Load Balancer.
+
+  </br>
+<image src="https://github.com/MoKenawy/sympai-backend/blob/main/docs/aws%20solution_V3.drawio.png"/>
+
 
 ## Installation
 
