@@ -17,12 +17,12 @@ class AWSConfig(BaseModel):
 
 # Pydantic model with arbitrary types allowed
 class GetChatHistProps(BaseModel):
-    table_name: str
+    username: str
     session_id: str
     boto3_session: Session
 
     def __hash__(self):
-        return hash((self.table_name, self.session_id))
+        return hash((self.username, self.session_id))
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 

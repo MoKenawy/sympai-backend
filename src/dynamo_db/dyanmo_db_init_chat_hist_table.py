@@ -13,11 +13,11 @@ import init  # noqa: E402, F401
 dynamodb = boto3.resource('dynamodb')
 
 # Define table name
-USER_SESSIONS_TABLE_NAME = 'UserSessions'
+USER_CHAT_SESSIONS_TABLE_NAME = os.getenv('USER_CHAT_SESSIONS_TABLE_NAME')
 
 # Create the DynamoDB table
 table = dynamodb.create_table(
-    TableName=USER_SESSIONS_TABLE_NAME,
+    TableName=USER_CHAT_SESSIONS_TABLE_NAME,
     KeySchema=[
         {"AttributeName": "username", "KeyType": "HASH"},  # Partition key
         {"AttributeName": "SessionId", "KeyType": "RANGE"}  # Sort key

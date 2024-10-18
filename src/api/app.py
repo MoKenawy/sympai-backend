@@ -15,7 +15,7 @@ sys.path.append(os.getenv('INIT_PATHS_DIR'))
 from auth.auth_logic import get_current_active_user  # noqa: E402
 import init  # noqa: E402, F401
 from dynamo_db.message_history import get_chat_hist  # noqa: E402
-from dynamo_db.scan_sessions import get_all_session_ids  # noqa: E402
+from dynamo_db.scan_sessions import get_user_chat_sessions, get_all_user_chat_sessions  # noqa: E402
 from models.biomistral import llm  # noqa: E402
 from config import aws_session , CHAT_HISTORY_TABLE_NAME  # noqa: E402
 from chains import new_chat_chain  # noqa: E402
@@ -68,7 +68,6 @@ def guest_chat(chat_input: GuestChatInput):
 
 class UserChatInput(BaseModel):
     prompt: str = Field(example="I have a headache", min_length=1, max_length= 4096// 2)
-    table_name : str = Field(example= CHAT_HISTORY_TABLE_NAME, min_length=1)
     session_id: str = Field(example="1", min_length=1)
 class UserChatOutput(BaseModel):
     response: str = Field(example="Hi. I’m SymptomSense, a medical chatbot designed to help you identify your symptoms and offer recommendations. To get started, can you please describe your symptoms in detail? What kind of headache is it? Is it constant or intermittent? Where is the pain located? And what's the intensity on a scale of 1-10?")
@@ -77,10 +76,10 @@ class UserChatOutput(BaseModel):
 
 
 @app.get("/api/get_user_history")
-def get_user_history(session_id : str):
+def get_user_history(session_id : str, current_user: User = Depends(get_current_active_user)):
     try:
         chat_hist_props = GetChatHistProps(
-            table_name= CHAT_HISTORY_TABLE_NAME,
+            username=current_user.username,
             session_id= session_id,
             boto3_session = aws_session
         )
@@ -94,10 +93,10 @@ def get_user_history(session_id : str):
 
 
 @app.get("/api/clear_user_history")
-def clear_user_history(session_id : str):
+def clear_user_history(session_id : str, current_user: User = Depends(get_current_active_user)):
     try:
         chat_hist_props = GetChatHistProps(
-            table_name= CHAT_HISTORY_TABLE_NAME,
+            username=current_user.username,
             session_id= session_id,
             boto3_session = aws_session
         )
@@ -108,12 +107,24 @@ def clear_user_history(session_id : str):
     except Exception as e:
         print(f"Error : {e}")
         return UserChatOutput(response="An Error Occured. Please try again later.")
+    
+
+@app.get("/api/delete_chat")
+def delete_chat(session_id : str, current_user: User = Depends(get_current_active_user)):
+    try:
+        ...
+    
+    except Exception as e:
+        print(f"Error : {e}")
+        return UserChatOutput(response="An Error Occured. Please try again later.")
+
 
 @app.post("/api/user_chat", response_model=UserChatOutput)
-def user_chat(user_chat_input: UserChatInput):
+def user_chat(user_chat_input: UserChatInput, current_user: User = Depends(get_current_active_user)):
+    
     try:
         chat_hist_props = GetChatHistProps(
-            table_name= user_chat_input.table_name,
+            username= current_user.username,
             session_id= user_chat_input.session_id,
             boto3_session = aws_session
         )
@@ -133,10 +144,11 @@ def user_chat(user_chat_input: UserChatInput):
         return UserChatOutput(response="An Error Occured. Please try again later.")
 
 
-@app.get("/api/scan_sessions", response_model=List[str])
+@app.get("/api/scan_sessions", response_model=List[dict])
 def scan_sessions(current_user: User = Depends(get_current_active_user)):
     try:
-        sessions = get_all_session_ids()
+        # sessions = get_all_session_ids()
+        sessions = get_all_user_chat_sessions(current_user.username)
         return sessions
     except Exception as e:
         print(f"Error : {e}")

@@ -1,11 +1,20 @@
 import boto3
 
+import sys
+import os
+from dotenv import load_dotenv
+load_dotenv()
+sys.path.append(os.getenv('INIT_PATHS_DIR'))
+
+
 # Initialize DynamoDB resource
 dynamodb = boto3.resource('dynamodb')
 
+USER_TABLE_NAME = os.getenv('USER_TABLE_NAME')
+
 # Define table creation with username as the primary key and SessionId as the sort key
 table = dynamodb.create_table(
-    TableName='UserTable',
+    TableName=USER_TABLE_NAME,
     KeySchema=[
         {"AttributeName": "username", "KeyType": "HASH"},  # Partition key
         {"AttributeName": "email", "KeyType": "RANGE"}  # Sort key
