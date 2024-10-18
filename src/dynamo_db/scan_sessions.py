@@ -40,7 +40,3 @@ def get_all_session_ids():
         session_ids.extend(item['SessionId'] for item in response['Items'])
     
     return session_ids
-
-# Example usage
-all_session_ids = get_all_session_ids()
-print(all_session_ids)

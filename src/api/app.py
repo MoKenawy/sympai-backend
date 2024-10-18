@@ -1,15 +1,18 @@
 
 from typing import List
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
 
 import sys
 import os
 from dotenv import load_dotenv
+
+from auth.auth_schemes import User
 load_dotenv()
 sys.path.append(os.getenv('INIT_PATHS_DIR'))
 
+from auth.auth_logic import get_current_active_user  # noqa: E402
 import init  # noqa: E402, F401
 from dynamo_db.message_history import get_chat_hist  # noqa: E402
 from dynamo_db.scan_sessions import get_all_session_ids  # noqa: E402
@@ -17,10 +20,12 @@ from models.biomistral import llm  # noqa: E402
 from config import aws_session , CHAT_HISTORY_TABLE_NAME  # noqa: E402
 from chains import new_chat_chain  # noqa: E402
 from schemas.schema import ChatProps , GetChatHistProps  # noqa: E402
-
+from auth.auth_app import auth_app  # noqa: E402, F401
 
 
 app = FastAPI()
+
+app.mount('/auth', auth_app)
 
 # Define the allowed origins (you can limit this to your frontend URL in production)
 origins = [
@@ -129,13 +134,23 @@ def user_chat(user_chat_input: UserChatInput):
 
 
 @app.get("/api/scan_sessions", response_model=List[str])
-def scan_sessions():
+def scan_sessions(current_user: User = Depends(get_current_active_user)):
     try:
         sessions = get_all_session_ids()
         return sessions
     except Exception as e:
         print(f"Error : {e}")
         return ['An Error Occured. Please try again later.']
+
+
+# @app.get("/api/scan_sessions", response_model=List[str])
+# def scan_sessions():
+#     try:
+#         sessions = get_all_session_ids()
+#         return sessions
+#     except Exception as e:
+#         print(f"Error : {e}")
+#         return ['An Error Occured. Please try again later.']
 
 
 
