@@ -1,26 +1,26 @@
 
 from typing import List
 from fastapi import Depends, FastAPI
-from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
 
 import sys
 import os
 from dotenv import load_dotenv
 
-from auth.auth_schemes import User
 load_dotenv()
 sys.path.append(os.getenv('INIT_PATHS_DIR'))
 
 from auth.auth_logic import get_current_active_user  # noqa: E402
 import init  # noqa: E402, F401
 from dynamo_db.message_history import get_chat_hist  # noqa: E402
-from dynamo_db.scan_sessions import get_user_chat_sessions, get_all_user_chat_sessions  # noqa: E402
+from dynamo_db.scan_sessions import get_all_user_chat_sessions  # noqa: E402
 from models.biomistral import llm  # noqa: E402
-from config import aws_session , CHAT_HISTORY_TABLE_NAME  # noqa: E402
+from config import aws_session  # noqa: E402
 from chains import new_chat_chain  # noqa: E402
-from schemas.schema import ChatProps , GetChatHistProps  # noqa: E402
 from auth.auth_app import auth_app  # noqa: E402, F401
+from schemas.schema import ChatProps , GetChatHistProps  # noqa: E402
+from auth.auth_schemes import User  # noqa: E402
+from schemas.api import GuestChatInput, GuestChatOutput, UserChatInput, UserChatOutput  # noqa: E402
 
 
 app = FastAPI()
@@ -44,19 +44,6 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
-class GuestChatInput(BaseModel):
-    prompt: str = Field(example="I have a headache", min_length=1, max_length= 4096// 2)
-    max_tokens: int = Field(default=4096, example=4096, ge=1, le=4096)
-    temperature: float = Field(default=None, example=0.4)
-    top_p: float = Field(default=None, example=0.5)
-    n: int = Field(default=None, example=1)
-    presence_penalty: float = Field(default=None, example=0.5)
-    frequency_penalty: float = Field(default=None, example=0.5)
-
-class GuestChatOutput(BaseModel):
-    response: str = Field(example="Hi. I’m SymptomSense, a medical chatbot designed to help you identify your symptoms and offer recommendations. To get started, can you please describe your symptoms in detail? What kind of headache is it? Is it constant or intermittent? Where is the pain located? And what's the intensity on a scale of 1-10?")
-
-
 @app.post("/api/guest_chat", response_model=GuestChatOutput)
 def guest_chat(chat_input: GuestChatInput):
     print(f"Guest prompt : {chat_input.prompt}")
@@ -64,13 +51,6 @@ def guest_chat(chat_input: GuestChatInput):
     print(f"SymAI response : {response.content}")
     return GuestChatOutput(response=response.content)
 
-# USER CHAT => With Chat History
-
-class UserChatInput(BaseModel):
-    prompt: str = Field(example="I have a headache", min_length=1, max_length= 4096// 2)
-    session_id: str = Field(example="1", min_length=1)
-class UserChatOutput(BaseModel):
-    response: str = Field(example="Hi. I’m SymptomSense, a medical chatbot designed to help you identify your symptoms and offer recommendations. To get started, can you please describe your symptoms in detail? What kind of headache is it? Is it constant or intermittent? Where is the pain located? And what's the intensity on a scale of 1-10?")
 
 
 

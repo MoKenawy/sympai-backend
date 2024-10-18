@@ -1,20 +1,11 @@
 from langchain_community.chat_message_histories import (
     DynamoDBChatMessageHistory,
 )
+from schemas.schema import GetChatHistProps
 from functools import lru_cache
 import os
 from dotenv import load_dotenv
 load_dotenv()
-
-
-import sys
-
-load_dotenv()
-sys.path.append(os.getenv('INIT_PATHS_DIR'))
-import init  # noqa: E402, F401
-
-from config import aws_session
-from schemas.schema import GetChatHistProps
 
 
 
@@ -34,15 +25,3 @@ def get_chat_hist(chat_hist_props : GetChatHistProps):
         boto3_session = chat_hist_props.boto3_session
     )
     return chat_history
-
-
-
-if __name__ == "__main__":
-    chat_hist_props = GetChatHistProps(
-        username= "moken",
-        session_id= "1",
-        boto3_session = aws_session
-    )
-    chat_history = get_chat_hist(chat_hist_props)
-    chat_history.add_user_message("Hello")
-    print(f"Chat History : {chat_history.messages}")

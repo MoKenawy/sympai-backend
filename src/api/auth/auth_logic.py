@@ -3,18 +3,21 @@ from datetime import timedelta
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
+from passlib.context import CryptContext
+
 import os
 import sys
 from dotenv import load_dotenv
-
 load_dotenv()
 sys.path.append(os.getenv('INIT_PATHS_DIR'))
 import init  # noqa: E402, F401
 
 from auth_schemes import TokenData, UserInDB  # noqa: E402
-from configs import ALGORITHM, SECRET_KEY, pwd_context, db
-from dynamo_db.fetch_user import get_user_by_username
+from unused.configs import ALGORITHM, SECRET_KEY  # noqa: E402
+from dynamo_db.fetch_user import get_user_by_username  # noqa: E402
 
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 
 def verify_password(plain_password, hashed_password):

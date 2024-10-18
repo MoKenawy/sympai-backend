@@ -14,7 +14,7 @@ dynamodb = boto3.resource('dynamodb')
 
 # Define table name
 USER_CHAT_SESSIONS_TABLE_NAME = os.getenv('USER_CHAT_SESSIONS_TABLE_NAME')
-
+ 
 # Create the DynamoDB table
 table = dynamodb.create_table(
     TableName=USER_CHAT_SESSIONS_TABLE_NAME,
@@ -31,4 +31,4 @@ table = dynamodb.create_table(
 
 # Wait until the table exists
 table.wait_until_exists()
-print(f"Table {USER_SESSIONS_TABLE_NAME} created successfully.")
+print(f"Table {USER_CHAT_SESSIONS_TABLE_NAME} created successfully.")

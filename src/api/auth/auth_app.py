@@ -1,14 +1,10 @@
-from fastapi import Depends, FastAPI, HTTPException, Request, status
-from fastapi.responses import RedirectResponse
+from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import timedelta
 
-from api.auth.auth_logic import authenticate_user, create_access_token, get_current_active_user, get_password_hash
-from api.auth.auth_schemes import Token, User, UserRegisterSchema
-from api.auth.configs import ACCESS_TOKEN_EXPIRE_MINUTES, db , SECRET_KEY, ALGORITHM
-from jose import jwt
-from starlette.middleware.base import BaseHTTPMiddleware
-
+from api.auth.auth_logic import authenticate_user, create_access_token, get_password_hash
+from api.auth.auth_schemes import Token, UserRegisterSchema
+from unused.configs import ACCESS_TOKEN_EXPIRE_MINUTES
 from dynamo_db.insert_user import insert_user_to_db
 
 
