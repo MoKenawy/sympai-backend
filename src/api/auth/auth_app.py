@@ -1,16 +1,38 @@
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, Response, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import timedelta
 
-from api.auth.auth_logic import authenticate_user, create_access_token, get_password_hash
-from api.auth.auth_schemes import Token, UserRegisterSchema
-from unused.configs import ACCESS_TOKEN_EXPIRE_MINUTES
+from auth.auth_logic import authenticate_user, create_access_token, get_password_hash
+from auth.auth_schemes import Token, UserRegisterSchema
+from configs import ACCESS_TOKEN_EXPIRE_MINUTES
 from dynamo_db.insert_user import insert_user_to_db
+from fastapi.middleware.cors import CORSMiddleware
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
+
+
 auth_app = FastAPI()
+
+# Define the allowed origins (you can limit this to your frontend URL in production)
+origins = [
+    "http://localhost:3000",  # Your Next.js frontend URL
+    "http://127.0.0.1:3000",  # Another form of localhost URL
+    "*",
+    "https://master.d3qfb4jv3hhifa.amplifyapp.com",  
+]
+
+# Apply the CORS middleware
+auth_app.add_middleware(
+    CORSMiddleware,
+    allow_origins= origins,  # List of allowed origins
+    allow_credentials=True,  # Allow cookies to be included in the request
+    allow_methods=["GET", "POST", "OPTIONS"],  # Explicitly allow OPTIONS method
+    allow_headers=["*"],  # Allow all headers
+)
+
 
 
 # # --- Middleware for Authentication --- #
@@ -42,7 +64,7 @@ auth_app = FastAPI()
 
 
 @auth_app.post("/token", response_model=Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login_for_access_token(response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
@@ -50,6 +72,16 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires)
+    
+    # Set the token in an HTTP-only cookie
+    response.set_cookie(
+        key="access_token", 
+        value=access_token, 
+        httponly=True, 
+        secure=True,  # Set True for production to enforce HTTPS
+        samesite="Lax"  # or "Strict" depending on your use case
+    )
+
     return {"access_token": access_token, "token_type": "bearer"}
 
 

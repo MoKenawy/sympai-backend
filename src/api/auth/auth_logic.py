@@ -1,6 +1,6 @@
 import datetime
 from datetime import timedelta
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -13,7 +13,7 @@ sys.path.append(os.getenv('INIT_PATHS_DIR'))
 import init  # noqa: E402, F401
 
 from auth_schemes import TokenData, UserInDB  # noqa: E402
-from unused.configs import ALGORITHM, SECRET_KEY  # noqa: E402
+from configs import ALGORITHM, SECRET_KEY  # noqa: E402
 from dynamo_db.fetch_user import get_user_by_username  # noqa: E402
 
 
@@ -53,24 +53,34 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+async def get_current_user(request: Request):
     """
-    Get the current user from the given token.
+    Get the current user from the JWT token stored in an HTTP-only cookie.
 
     If the token is invalid, raises a 401 HTTPException.
 
     Args:
-        token (str): The token to get the user from.
+        request (Request): The FastAPI request object.
 
     Returns:
         UserInDB: The user represented by the given token.
     """
-    credential_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                                         detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
+    credential_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    # Extract the token from cookies instead of the Authorization header
+    token = request.cookies.get("access_token")
+    if not token:
+        raise credential_exception
+
     try:
+        # Decode the JWT token
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
+
         if username is None:
             raise credential_exception
 
@@ -78,6 +88,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     except JWTError:
         raise credential_exception
 
+    # Fetch the user by username (this assumes a `get_user` function exists)
     user = get_user(username=token_data.username)
     if user is None:
         raise credential_exception
